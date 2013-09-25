@@ -44,7 +44,6 @@ public class BookResource {
     
     public BookDto getBookByIsbn(@PathParam("isbn") int isbn) {
 	Book book =hash.get(isbn);	
-	
 	BookDto bookResponse = new BookDto(book);
 	bookResponse.addLink(new LinkDto("view-book", "/books/" + book.getIsbn(),"GET"));
 	bookResponse.addLink(new LinkDto("update-book","/books/" + book.getIsbn(), "PUT"));
@@ -52,7 +51,6 @@ public class BookResource {
 	bookResponse.addLink(new LinkDto("create-review","/books/" + book.getIsbn()+"/reviews", "POST"));
 	if(book.reviews.size()>0)
 	bookResponse.addLink(new LinkDto("view-all-review","/books/" + book.getIsbn()+"/reviews", "GET"));
-	
 	return bookResponse;
     }
     
@@ -74,6 +72,8 @@ public class BookResource {
     @Timed(name = "update-book")
     public Response UpdateBook(@PathParam("isbn") int isbn, @QueryParam("status") String status){
     	Book book=hash.get(isbn);
+    	if(status.equalsIgnoreCase("available")||status.equalsIgnoreCase("lost")||status.equalsIgnoreCase("in-queue")||status.equalsIgnoreCase("checked-out"))
+    	{
     	book.setStatus(status);
     	LinksDto bookResponse = new LinksDto();
     	bookResponse.addLink(new LinkDto("view-book", "/books/" + book.getIsbn(),"GET"));
@@ -83,16 +83,23 @@ public class BookResource {
     	if(book.reviews.size()>0)
     	bookResponse.addLink(new LinkDto("view-all-review","/books/" + book.getIsbn()+"/reviews", "GET"));
    	  	return Response.status(200).entity(bookResponse).build();
+    	}
+    	else
+    		return Response.status(400).entity("Not a valid status").build();
   }
     @DELETE
     @Path("/{isbn}")
     @Timed(name = "delete-book")
     public Response DeleteBook(@PathParam("isbn") int isbn){ 
+    	if(hash.containsKey(isbn)){
     	Book book=hash.get(isbn);
     	hash.remove(isbn);
     	LinksDto bookResponse=new LinksDto();
     	bookResponse.addLink(new LinkDto("create-book", "/books/"+book.getIsbn(),"POST"));
     	return Response.status(200).entity(bookResponse).build();
+    	}
+    	else
+    	return Response.status(400).entity("ISBN does not exists").build();
 }
     @POST
     @Path("/{isbn}/reviews")
@@ -100,30 +107,39 @@ public class BookResource {
    
     
     public Response createReview(@PathParam("isbn") int isbn,Reviews reviews) {
-	Book book =hash.get(isbn);	
+    if(hash.containsKey(isbn)){
+    Book book =hash.get(isbn);	
 	@SuppressWarnings("unused")
 	ArrayList<Reviews> review=book.addReviews(reviews);
 	LinksDto bookResponse = new LinksDto();
 	bookResponse.addLink(new LinkDto("view-review", "/books/" + book.getIsbn()+"/reviews/"+reviews.getId(),"GET"));
 	return Response.status(201).entity(bookResponse).build();
     }
+	else
+    	return Response.status(400).entity("ISBN does not exists").build();
+    }
     @GET
     @Path("/{isbn}/reviews/{id}")
     @Timed(name="view-reviews")
     public Response viewReviewsById(@PathParam("isbn") int isbn,@PathParam("id") int id){
+    	if(hash.containsKey(isbn)){
     	Book book =hash.get(isbn);	
     	Reviews reviews=new Reviews();
     	reviews=book.ReviewId(id);
     	ReviewsDto reviewResponse = new ReviewsDto(reviews);
-    	reviewResponse.addLink(new LinkDto("view-review", "/books/" + book.getIsbn()+"/reviews/"+reviews.getId(),"GET"));
+    	reviewResponse.addLink(new LinkDto("view-review", "/books/" + book.getIsbn()+"/reviews/"+id,"GET"));
     	return Response.status(200).entity(reviewResponse).build();	
+    	}
+    	else
+    		return Response.status(400).entity("ISBN does not exists").build();
     }
     @GET
     @Path("/{isbn}/reviews")
     @Timed(name="view-reviews")
     public Response viewReviews(@PathParam("isbn") int isbn){
+    	if(hash.containsKey(isbn)){
     	Book book =hash.get(isbn);	
-    	ArrayList<Reviews> reviews=new ArrayList<Reviews>();
+    	ArrayList<Reviews> reviews;
     	reviews=book.AllReviews();
     	@SuppressWarnings("unused")
 		ReviewsDto reviewResponse = new ReviewsDto();
@@ -132,24 +148,31 @@ public class BookResource {
     		reviewResponse=new ReviewsDto(reviews.get(i));
     		
     	}
-    	return Response.status(200).entity(reviews).build();	
+    	return Response.status(200).entity(reviews).build();
+    	}
+    	else
+    	return Response.status(400).entity("ISBN does not exists").build();
     }
     @GET
     @Path("/{isbn}/authors/{id}")
     @Timed(name="view-author")
     public Response viewAuthorsById(@PathParam("isbn") int isbn,@PathParam("id") int id){
+    	if(hash.containsKey(isbn)){
     	Book book =hash.get(isbn);	
     	Authors authors=new Authors();
     	authors=book.AuthorsId(id);
     	AuthorsDto authorResponse=new AuthorsDto(authors);
-    	authorResponse.addLink(new LinkDto("view-author", "/books/" + book.getIsbn()+"/authors/"+authors.getId(),"GET"));
+    	authorResponse.addLink(new LinkDto("view-author", "/books/" + book.getIsbn()+"/authors/"+id,"GET"));
     	return Response.status(200).entity(authorResponse).build();
-    	
+    	}
+    	else    		
+    		return Response.status(400).entity("ISBN does not exists").build();
     }
     @GET
     @Path("/{isbn}/authors")
     @Timed(name="view-authors")
     public Response viewAllAuthors(@PathParam("isbn") int isbn){
+    	if(hash.containsKey(isbn)){
     	Book book =hash.get(isbn);	
     	ArrayList<Authors> authors=new ArrayList<Authors>();
     	authors=book.AllAuthors();
@@ -160,6 +183,9 @@ public class BookResource {
     		authorResponse=new AuthorsDto(authors.get(i));
     		
     	}
-    	return Response.status(200).entity(authors).build();	
+    	return Response.status(200).entity(authors).build();
+    }
+    	else
+    	return Response.status(400).entity("ISBN does not exists").build();
     }
 }

@@ -27,7 +27,7 @@ public class Book {
     private String status="available";
     private ArrayList<Authors> authors=new ArrayList<Authors>();
     public ArrayList<Reviews> reviews=new ArrayList<Reviews>();
-    static int rc=1;
+    public static int rc=1;
     /**
      * @return the isbn
      */
@@ -89,12 +89,11 @@ public class Book {
     public ArrayList<Reviews> getReviews() {
 		return reviews;
 	}
-
-public void setReviews(ArrayList<Reviews> reviews) {
+    public void setReviews(ArrayList<Reviews> reviews) {
 	  this.reviews=reviews;
       }
 
-public ArrayList<Reviews> addReviews(Reviews reviews2) {
+    public ArrayList<Reviews> addReviews(Reviews reviews2) {
 	
 		reviews2.setId(rc);
 		if(reviews.size()==0)
@@ -106,7 +105,7 @@ public ArrayList<Reviews> addReviews(Reviews reviews2) {
 		return reviews;
 	}
 
-public Reviews ReviewId(int id) {
+    public Reviews ReviewId(int id) {
 	Reviews review=new Reviews();
 	for(int i=1;i<=reviews.size();i++){
 		if(i==id){
@@ -117,7 +116,7 @@ public Reviews ReviewId(int id) {
 	return review;
 }
 
-public ArrayList<Reviews> AllReviews() {
+    public ArrayList<Reviews> AllReviews() {
 	ArrayList<Reviews> review=new ArrayList<Reviews>();
 	for(int i=1;i<=reviews.size();i++){
 		review.add(reviews.get(i-1));
@@ -125,7 +124,7 @@ public ArrayList<Reviews> AllReviews() {
 return review;
 }
 
-public Authors AuthorsId(int id) {
+    public Authors AuthorsId(int id) {
 	Authors author=new Authors();
 	for(int i=1;i<=authors.size();i++){
 		if(i==id){
@@ -136,7 +135,7 @@ public Authors AuthorsId(int id) {
 	return author;
 }
 
-public ArrayList<Authors> AllAuthors() {
+    public ArrayList<Authors> AllAuthors() {
 	ArrayList<Authors> author=new ArrayList<Authors>();
 	for(int i=1;i<=authors.size();i++){
 		author.add(authors.get(i-1));

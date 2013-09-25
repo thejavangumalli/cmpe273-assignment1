@@ -1,13 +1,18 @@
 package edu.sjsu.cmpe.library.domain;
 
 public class Authors {
-	static int id=1;
+	int id;
+	static int i=1;
 	private String name;
+	public Authors(){
+				
+	}
+	
 	public int getId(){
-		return id;
+		return i++;
 			}
-	public void setId(){
-		this.id=id++;
+	public void setId(int i){
+		this.id=i;
 	}
 	public String getName(){
 		return name;
